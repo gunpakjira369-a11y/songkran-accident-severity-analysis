@@ -1,5 +1,5 @@
 
-const CSV_PATH = "../data/songkran_51-57_clean.csv";
+const CSV_PATH = "../data/songkran_51-57_clean.csv.gz";
 
 let allRows = [];
 let filteredRows = [];
@@ -288,8 +288,15 @@ async function loadData() {
             throw new Error(`โหลด CSV ไม่สำเร็จ: HTTP ${response.status}`);
         }
 
-        const text = await response.text();
-        const parsed = parseCSV(text);
+    const compressed = new Uint8Array(
+        await response.arrayBuffer()
+    );
+
+    const text = pako.ungzip(compressed, {
+        to: "string"
+    });
+
+const parsed = parseCSV(text);
 
         if (!parsed.length) {
             throw new Error("ไม่พบข้อมูลใน CSV");
