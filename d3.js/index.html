@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <title>Songkran Accident Analysis — D3.js</title>
+
+    <link href="style.css" rel="stylesheet"/>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+
+<body>
+
+<header class="hero">
+    <div>
+        <span class="eyebrow">DATA VISUALIZATION • D3.JS</span>
+
+        <h1>
+            การวิเคราะห์ความรุนแรงของอุบัติเหตุช่วงเทศกาลสงกรานต์
+        </h1>
+
+        <p>
+            วิเคราะห์ผู้ประสบเหตุทั้งผู้ที่ไม่เสียชีวิตและผู้เสียชีวิต
+            โดยพิจารณาผลการรักษาร่วมกับปัจจัยด้านพื้นที่ เวลา เพศ และพฤติกรรม
+        </p>
+    </div>
+</header>
+
+
+<main class="container">
+
+    <!-- ==================== FILTER ==================== -->
+    <section class="filters card">
+
+        <div class="filter-title">
+            ตัวกรองข้อมูล
+        </div>
+
+        <label>
+            เทศกาล
+            <select id="festivalFilter">
+                <option value="all">ทั้งหมด</option>
+            </select>
+        </label>
+
+        <label>
+            จังหวัด
+            <select id="provinceFilter">
+                <option value="all">ทั้งหมด</option>
+            </select>
+        </label>
+
+        <label>
+            เพศ
+            <select id="genderFilter">
+                <option value="all">ทั้งหมด</option>
+            </select>
+        </label>
+
+        <label>
+            การดื่มสุรา
+            <select id="alcoholFilter">
+                <option value="all">ทั้งหมด</option>
+            </select>
+        </label>
+
+        <button id="resetBtn">
+            รีเซ็ต
+        </button>
+
+        <div class="interaction-note">
+            คลิก/ชี้กราฟเพื่อดูรายละเอียด • Filter เปลี่ยนกราฟทั้งหมด
+        </div>
+
+    </section>
+
+
+    <!-- ==================== KPI ==================== -->
+    <section class="kpis">
+
+        <div class="kpi card">
+            <span>ผู้ประสบเหตุทั้งหมด</span>
+            <strong id="kpiTotal">-</strong>
+        </div>
+
+        <div class="kpi card danger">
+            <span>ผู้เสียชีวิต</span>
+            <strong id="kpiDeaths">-</strong>
+        </div>
+
+        <div class="kpi card">
+            <span>อัตราการเสียชีวิต</span>
+            <strong id="kpiRate">-</strong>
+        </div>
+
+        <div class="kpi card">
+            <span>จังหวัดที่มีข้อมูล</span>
+            <strong id="kpiProvinces">-</strong>
+        </div>
+
+    </section>
+
+
+    <!-- ==================== OUTCOME / SEVERITY ==================== -->
+    <section class="grid two">
+
+        <div class="card chart-card">
+
+            <div class="section-head">
+
+                <div>
+                    <h2>ผลการรักษา</h2>
+                    <p>
+                        แสดงจำนวนผู้ประสบเหตุแยกตามผลการรักษา
+                    </p>
+                </div>
+
+                <span>จำนวนราย</span>
+
+            </div>
+
+            <div id="outcomeChart"></div>
+
+        </div>
+
+
+        <div class="card chart-card">
+
+            <div class="section-head">
+
+                <h2>
+                    ระดับความรุนแรง
+                </h2>
+
+                <span>
+                    ไม่เสียชีวิต vs เสียชีวิต
+                </span>
+
+            </div>
+
+            <div id="severityChart"></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================== MAP ==================== -->
+    <section class="card map-card">
+
+        <div class="section-head">
+
+            <div>
+
+                <h2>
+                    แผนที่จังหวัด
+                </h2>
+
+                <p>
+                    สีเข้มขึ้น = จำนวนผู้เสียชีวิตในจังหวัดมากขึ้น
+                </p>
+
+            </div>
+
+            <div id="mapLegend"></div>
+
+        </div>
+
+        <div id="map"></div>
+
+    </section>
+
+
+    <!-- ==================== PROVINCE / HOUR ==================== -->
+    <section class="grid two">
+
+        <div class="card chart-card">
+
+            <div class="section-head">
+
+                <h2>
+                    10 จังหวัดที่มีผู้ประสบเหตุสูงสุด
+                </h2>
+
+                <span>
+                    เรียงจากมากไปน้อย
+                </span>
+
+            </div>
+
+            <div id="provinceChart"></div>
+
+        </div>
+
+
+        <div class="card chart-card">
+
+            <div class="section-head">
+
+                <h2>
+                    จำนวนผู้ประสบเหตุตามชั่วโมง
+                </h2>
+
+                <span>
+                    จากเวลาเกิดเหตุ
+                </span>
+
+            </div>
+
+            <div id="hourChart"></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================== FESTIVAL / GENDER ==================== -->
+    <section class="grid two">
+
+        <div class="card chart-card">
+
+            <div class="section-head">
+
+                <div>
+
+                    <h2>
+                        จำนวนผู้ประสบเหตุตามเทศกาล
+                    </h2>
+
+                    <p>
+                        เปรียบเทียบผู้ที่ไม่เสียชีวิตและผู้เสียชีวิต
+                    </p>
+
+                </div>
+
+                <span>
+                    ราย
+                </span>
+
+            </div>
+
+            <div id="festivalSeverityChart"></div>
+
+        </div>
+
+
+        <div class="card chart-card">
+
+            <div class="section-head">
+
+                <div>
+
+                    <h2>
+                        ผู้ประสบเหตุตามเพศ
+                    </h2>
+
+                    <p>
+                        สัดส่วนผู้ประสบเหตุชายและหญิง
+                    </p>
+
+                </div>
+
+                <span>
+                    ราย
+                </span>
+
+            </div>
+
+            <div id="genderChart"></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================== ALCOHOL ==================== -->
+    <section class="grid two">
+
+        <div class="card chart-card">
+
+            <div class="section-head">
+
+                <div>
+
+                    <h2>
+                        การดื่มสุรา
+                    </h2>
+
+                    <p>
+                        เปรียบเทียบดื่ม ไม่ดื่ม และไม่ทราบ
+                    </p>
+
+                </div>
+
+                <span>
+                    ราย
+                </span>
+
+            </div>
+
+            <div id="alcoholChart"></div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ==================== SUMMARY ==================== -->
+    <section class="card insight">
+
+        <h2>
+            สรุปจากข้อมูลที่เลือก
+        </h2>
+
+        <div id="insightText">
+            กำลังโหลดข้อมูล...
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- ==================== GLOBAL TOOLTIP ==================== -->
+<!-- ใช้ร่วมกันทั้งกราฟ D3 และแผนที่ -->
+<div
+    id="tooltip"
+    class="tooltip"
+    role="tooltip"
+    aria-hidden="true">
+</div>
+
+
+<!-- ==================== D3 SCRIPT ==================== -->
+<script src="script.js"></script>
+
+</body>
+</html>

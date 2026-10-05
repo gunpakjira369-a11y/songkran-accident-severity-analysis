@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+
+<html lang="th">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Songkran Accident Analysis — Chart.js</title>
+<link href="style.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.3/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+</head>
+<body>
+<header class="hero">
+<span class="eyebrow">DATA VISUALIZATION • CHART.JS</span>
+<h1>การวิเคราะห์ความรุนแรงของอุบัติเหตุช่วงเทศกาลสงกรานต์</h1>
+<p>วิเคราะห์ผู้ประสบเหตุทั้งผู้ที่ไม่เสียชีวิตและผู้เสียชีวิต โดยพิจารณาผลการรักษาร่วมกับปัจจัยด้านพื้นที่ เวลา เพศ และพฤติกรรม</p>
+</header>
+<main class="container">
+<section class="filters card">
+<div class="filter-title">ตัวกรองข้อมูล</div>
+<label>เทศกาล<select id="festivalFilter"><option value="all">ทั้งหมด</option></select></label>
+<label>จังหวัด<select id="provinceFilter"><option value="all">ทั้งหมด</option></select></label>
+<label>เพศ<select id="genderFilter"><option value="all">ทั้งหมด</option></select></label>
+<label>การดื่มสุรา<select id="alcoholFilter"><option value="all">ทั้งหมด</option></select></label>
+<button id="resetBtn">รีเซ็ต</button><div class="interaction-note">คลิก/ชี้กราฟเพื่อดูรายละเอียด • Filter เปลี่ยนกราฟทั้งหมด</div>
+</section>
+<section class="kpis">
+<div class="kpi card"><span>ผู้ประสบเหตุทั้งหมด</span><strong id="kpiTotal">-</strong></div>
+<div class="kpi card danger"><span>ผู้เสียชีวิต</span><strong id="kpiDeaths">-</strong></div>
+<div class="kpi card"><span>อัตราการเสียชีวิต</span><strong id="kpiRate">-</strong></div>
+<div class="kpi card"><span>จังหวัดที่มีข้อมูล</span><strong id="kpiProvinces">-</strong></div>
+</section>
+<section class="grid two">
+<div class="card chart-card"><div class="section-head"><h2>ผลการรักษา</h2><span>จำนวนผู้ประสบเหตุ</span></div><div class="canvas-wrap"><canvas id="outcomeChart"></canvas></div></div>
+<div class="card chart-card"><div class="section-head"><h2>ระดับความรุนแรง</h2><span>ไม่เสียชีวิต vs เสียชีวิต</span></div><div class="canvas-wrap"><canvas id="severityChart"></canvas></div></div>
+</section>
+<section class="card map-card">
+<div class="section-head"><div><h2>แผนที่จังหวัด</h2><p>สีเข้มขึ้น = จำนวนผู้เสียชีวิตในจังหวัดมากขึ้น</p></div><span>Hover เพื่อดูรายละเอียด</span></div>
+<div id="map"></div><div class="tooltip" id="tooltip"></div>
+</section>
+<section class="grid two">
+<div class="card chart-card"><div class="section-head"><h2>10 จังหวัดที่มีผู้ประสบเหตุสูงสุด</h2><span>เรียงจากมากไปน้อย</span></div><div class="canvas-wrap"><canvas id="provinceChart"></canvas></div></div>
+<div class="card chart-card"><div class="section-head"><h2>จำนวนผู้ประสบเหตุตามชั่วโมง</h2><span>จากเวลาเกิดเหตุ</span></div><div class="canvas-wrap"><canvas id="hourChart"></canvas></div></div>
+</section>
+<section class="grid two">
+<div class="card chart-card">
+<div class="section-head"><div><h2>จำนวนผู้ประสบเหตุตามเทศกาล</h2><p>เปรียบเทียบผู้ประสบเหตุ ผู้ที่ทุเลา/หาย และผู้เสียชีวิต</p></div><span>ราย</span></div>
+<div class="canvas-wrap"><canvas id="festivalSeverityChart"></canvas></div>
+</div>
+<div class="card chart-card">
+<div class="section-head"><div><h2>ผู้ประสบเหตุตามเพศ</h2><p>สัดส่วนผู้ประสบเหตุชายและหญิง</p></div><span>ราย</span></div>
+<div class="canvas-wrap"><canvas id="genderChart"></canvas></div>
+</div>
+</section>
+<section class="grid two">
+<div class="card chart-card">
+<div class="section-head"><div><h2>การดื่มสุรา</h2><p>เปรียบเทียบดื่ม ไม่ดื่ม และไม่ทราบ</p></div><span>ราย</span></div>
+<div class="canvas-wrap"><canvas id="alcoholChart"></canvas></div>
+</div>
+
+</section>
+<section class="card insight">
+<h2>สรุปจากข้อมูลที่เลือก</h2>
+<div id="insightText">กำลังโหลดข้อมูล...</div>
+</section>
+</main>
+<script src="script.js"></script>
+</body>
+</html>
