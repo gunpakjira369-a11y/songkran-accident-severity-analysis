@@ -1,15 +1,4 @@
-// เปลี่ยนจาก:
-// d3.csv("../data/songkran_51-57_clean.csv")
-
-// ให้เปลี่ยนมาใช้ Link นี้แทน:
-d3.csv("https://media.githubusercontent.com/media/gunpakjira369-a11y/songkran-accident-severity-analysis/refs/heads/main/data/songkran_51-57_clean.csv")
-  .then(data => {
-      console.log("Data loaded:", data.length); // ควรจะเห็นจำนวน 200,000+ รายการ
-      // โค้ดสร้าง กราฟ / แผนที่ ของคุณ
-  })
-  .catch(error => {
-      console.error("Error loading CSV:", error);
-  });
+const CSV_PATH = "../data/songkran_51-57_clean.csv";
 
 let allRows = [];
 let filteredRows = [];
