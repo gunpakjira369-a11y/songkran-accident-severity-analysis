@@ -1,4 +1,4 @@
-const CSV_PATH = "../../data/songkran_51-57_clean.csv";
+const CSV_PATH = "../data/songkran_51-57_clean.csv";
 
 let allRows = [];
 let filteredRows = [];
